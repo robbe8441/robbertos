@@ -31,8 +31,8 @@ macro_rules! enclose {
 
 impl BotSaveData {
     fn load() -> Self {
-        let conin_file = std::fs::read_to_string("coin_store.json").unwrap();
-        let save_data: Self = serde_json::from_str(&conin_file).unwrap_or_default();
+        let coin_file = std::fs::read_to_string("coin_store.json").unwrap();
+        let save_data: Self = serde_json::from_str(&coin_file).unwrap_or_default();
         save_data
     }
 
@@ -110,16 +110,12 @@ fn main() -> DynResult<()> {
             "!gamble",
             enclose! { (save_data) move |args: Args| {
 
-                let mut bot_data = match save_data.lock() {
-                    Ok(v) => v,
-                    // Mutex has been poisoned, reload the file
-                    Err(_) => {
-                        save_data.clear_poison();
-                        let mut lock = save_data.lock().unwrap();
-                        lock.reload();
-                        lock
-                    }
-                };
+                let mut bot_data = if let Ok(v) = save_data.lock() { v } else {
+                       save_data.clear_poison();
+                       let mut lock = save_data.lock().unwrap();
+                       lock.reload();
+                       lock
+                   };
 
                 let Some(reply) = bot_data.gamble(args.msg) else {
                     return;
