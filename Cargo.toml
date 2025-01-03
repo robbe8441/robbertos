@@ -1,0 +1,11 @@
+[package]
+name = "robbertos"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rand = "0.8.5"
+serde = { version = "1.0.217", features = ["derive"] }
+serde_json = "1.0.134"
+smol = "2.0.2"
+twitchchat = { version = "0.14.8", features = ["smol", "async"] }
